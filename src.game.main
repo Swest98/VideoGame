@@ -1,0 +1,15 @@
+package game;
+
+import javax.swing.JFrame;
+
+import engine.Window;
+
+public class Main extends JFrame{
+	
+	public static void main(String[] args) {
+		
+		Window window = new Window("Game Title", 1280, 720);
+
+	}
+
+}
