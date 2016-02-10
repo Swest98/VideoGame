@@ -1,17 +1,63 @@
 package engine;
 
+import java.awt.Canvas;
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 
-@SuppressWarnings("serial")
-public class Window extends JFrame{
+import game.MainMenu;
+
+public class Window extends Canvas implements Runnable{
+	private static final long serialVersionUID = 1L;
+	MainMenu menu = new MainMenu();
+	private static String title;
+	private static int width, height, scale;
 	
-	public Window(String title, int width, int height){
-		setTitle(title);
-		setSize(width, height);
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
+	private boolean running = false;
+	private Thread GameThread;
+	private JFrame frame;
+	
+	public Window(){
+		width = menu.getWidth();
+		height = menu.getHeight();
+		scale = menu.getScale();
+		Dimension size = new Dimension( width*scale, height*scale);
+		setPreferredSize(size);
+		frame = new JFrame();
 	}
 	
+	public synchronized void start(){
+		running = true;
+		GameThread = new Thread(this);
+		GameThread.start();
+	}
 	
+	public synchronized void stop(){
+		running = false;
+		try{
+			GameThread.join();
+		}catch(InterruptedException nope){
+			nope.printStackTrace();
+		}
+	}
+	
+	public void run(){
+		while(running == true){
+			System.out.println("The Game is Running...");
+		}
+	}
+	
+	public void GameMain(){
+		title = menu.getTitle();
+		Window game = new Window();
+		game.frame.setResizable(false);
+		game.frame.setTitle(title);
+		game.frame.add(game);
+		game.frame.pack(); //sets size of the frame to that of the component
+		game.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		game.frame.setVisible(true);
+		game.frame.setLocationRelativeTo(null);
+		
+		game.start(); //Time to start the game!
+	}
 }
