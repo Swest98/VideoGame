@@ -9,17 +9,30 @@ import engine.Window;
 @SuppressWarnings("serial")
 public class MainMenu extends JFrame{
 	
+	public static String WindowTitle = "Game Title";
+	public static int width = 1280;
+	public static int height = 720;
+	public static int scale = 1;
+	
+	
+	public String getTitle(){
+		return WindowTitle;
+	}
+	public int getWidth(){
+		return width;
+	}
+	public int getHeight(){
+		return height;
+	}
+	public int getScale(){
+		return scale;
+	}
+	
 	public static void main(String[] args) {
-		
 		@SuppressWarnings("unused")
-		Window window = new Window("Game Title", 1280, 720);
+		Window window = new Window();
+		window.GameMain();
 		
-		JPanel pnlPlayGame = new JPanel();
-		JButton btnPlayGame = new JButton("Play Game");
-		btnPlayGame.addActionListener(null);
-		
-		btnPlayGame.add(pnlPlayGame);
-		btnPlayGame.
 	}
 
 }
