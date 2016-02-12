@@ -1,0 +1,44 @@
+package game;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import engine.Window;
+
+@SuppressWarnings("serial")
+public class GameMain extends JFrame{
+	
+	public static String WindowTitle = "Game Title";
+	public static int width = 300;
+	public static int height = 169;
+	public static int scale = 3;
+	public static int MAP_SIZE = 8; //How many tiles in the x or y direction that the map will be
+	public static int tilesize = 16; //How many pixels the length and height of each tile will be
+	
+	
+	public String getTitle(){
+		return WindowTitle;
+	}
+	public int getWidth(){
+		return width;
+	}
+	public int getHeight(){
+		return height;
+	}
+	public int getScale(){
+		return scale;
+	}
+	public int getMapSize(){
+		return MAP_SIZE;
+	}
+	public int getTileSize(){
+		return tilesize;
+	}
+	
+	public static void main(String[] args) {
+		Window window = new Window();
+		window.GameMain();
+		
+	}
+
+}
