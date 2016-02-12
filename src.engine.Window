@@ -1,30 +1,47 @@
 package engine;
 
-import java.awt.BorderLayout;
 import java.awt.Canvas;
+
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
 import game.GameMain;
+import game.Keyboard;
 
 public class Window extends Canvas implements Runnable{
 	private static final long serialVersionUID = 1L;
-	GameMain menu = new GameMain();
+	GameMain GM = new GameMain();
 	private static String title;
-	private static int width, height, scale;
+	private int width = GM.getWidth();
+	private int height = GM.getHeight();
+	private int scale = GM.getScale();
 	
 	private boolean running = false;
 	private Thread GameThread;
 	private JFrame frame;
+	private Keyboard key;
+	
+	private Render screen;
+
+	private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 	
 	public Window(){
-		width = menu.getWidth();
-		height = menu.getHeight();
-		scale = menu.getScale();
+		
+		
 		Dimension size = new Dimension( width*scale, height*scale);
 		setPreferredSize(size);
+		screen = new Render(width, height);
 		frame = new JFrame();
+		key = new Keyboard();
+		
+		addKeyListener(key);
 	}
 	
 	public synchronized void start(){
@@ -43,13 +60,74 @@ public class Window extends Canvas implements Runnable{
 	}
 	
 	public void run(){
+		long lastTime = System.nanoTime();
+		long timer = System.currentTimeMillis();
+		final double ns = 1000000000.0 / 60.0;
+		double delta = 0;
+		int frames = 0;
+		int updates = 0;
 		while(running == true){
-			System.out.println("The Game is Running...");
+			long now = System.nanoTime();
+			delta += (now - lastTime) / ns;
+			lastTime = now;
+			while (delta >= 1) {
+				update();				//will update at a specific speed so that gameplay is consistent across different computers
+				updates++;
+				delta--;
+			}
+						
+			render();			//will run at unlimited speed
+			frames++;
+			
+			if (System.currentTimeMillis() - timer > 1000) {
+				timer += 1000;
+				frame.setTitle(title + "  |  " + frames + "fps  " + updates + "ups");
+				updates = 0;
+				frames = 0;
+			}
 		}
+		stop();
+	}
+
+	int x = 0, y = 0;
+	
+	public void update(){
+		key.update();
+		if (key.up) y--;
+		if (key.down) y++;
+		if (key.left) x--;
+		if (key.right) x++;
+		}
+	
+	public void render(){
+		BufferStrategy bs = getBufferStrategy();
+		if(bs == null) {
+			createBufferStrategy(3);	//buffer 3 images at one time
+			return;
+		}
+		
+		screen.clear();
+		screen.render(x, y);
+		
+		for (int i = 0; i < pixels.length; i++){
+			pixels[i] = screen.pixels[i];
+		}
+		
+		Graphics g = bs.getDrawGraphics();
+		
+		/* The graphics you want to display go after here... */
+		
+		g.setColor(new Color(200, 40, 40));
+		g.fillRect(0, 0, width, height);
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+		/* ...and before here. */
+		
+		g.dispose();	//gets rid of stored graphics so that you don't crash
+		bs.show(); 		//makes the next buffer visible
 	}
 	
 	public void GameMain(){
-		title = menu.getTitle();
+		title = GM.getTitle();
 		Window game = new Window();
 		game.frame.setResizable(false);
 		game.frame.setTitle(title);
